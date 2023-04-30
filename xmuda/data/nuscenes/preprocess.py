@@ -6,6 +6,7 @@ import pickle
 from nuscenes.nuscenes import NuScenes
 from nuscenes.utils.geometry_utils import points_in_box
 from nuscenes.eval.detection.utils import category_to_detection_name
+from tqdm import tqdm
 
 from xmuda.data.nuscenes.nuscenes_dataloader import NuScenesBase
 from xmuda.data.nuscenes.projection import map_pointcloud_to_image
@@ -27,9 +28,12 @@ def preprocess(nusc, split_names, root_dir, out_dir,
     # init dict to save
     pkl_dict = {}
     for split_name in split_names:
-         pkl_dict[split_name] = []
+        pkl_dict[split_name] = []
 
-    for i, sample in enumerate(nusc.sample):
+    print('start preprocess {}'.format(split_names))
+
+    for i in tqdm(range(len(nusc.sample))):
+        sample = nusc.sample[i]
         curr_scene_name = nusc.get('scene', sample['scene_token'])['name']
 
         # get if the current scene is in train, val or test
@@ -76,11 +80,11 @@ def preprocess(nusc, split_names, root_dir, out_dir,
 
         sd_rec_lidar = nusc.get('sample_data', sample['data']["LIDAR_TOP"])
         cs_record_lidar = nusc.get('calibrated_sensor',
-                             sd_rec_lidar['calibrated_sensor_token'])
+                                   sd_rec_lidar['calibrated_sensor_token'])
         pose_record_lidar = nusc.get('ego_pose', sd_rec_lidar['ego_pose_token'])
         sd_rec_cam = nusc.get('sample_data', sample['data']["CAM_FRONT"])
         cs_record_cam = nusc.get('calibrated_sensor',
-                             sd_rec_cam['calibrated_sensor_token'])
+                                 sd_rec_cam['calibrated_sensor_token'])
         pose_record_cam = nusc.get('ego_pose', sd_rec_cam['ego_pose_token'])
 
         calib_infos = {
@@ -150,8 +154,9 @@ def preprocess(nusc, split_names, root_dir, out_dir,
 
 
 if __name__ == '__main__':
-    root_dir = '/datasets_master/nuscenes'
-    out_dir = '/datasets_local/datasets_mjaritz/nuscenes_preprocess'
+    print("开始处理数据！！！")
+    root_dir = '/nfs/s3_common_dataset/nuscenes-full-data-v1.0'
+    out_dir = '/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/nuscenes_preprocess'
     nusc = NuScenes(version='v1.0-trainval', dataroot=root_dir, verbose=True)
     # for faster debugging, the script can be run using the mini dataset
     # nusc = NuScenes(version='v1.0-mini', dataroot=root_dir, verbose=True)
@@ -161,4 +166,6 @@ if __name__ == '__main__':
     preprocess(nusc, ['train', 'test'], root_dir, out_dir, location='boston', subset_name='usa')
     preprocess(nusc, ['train', 'val', 'test'], root_dir, out_dir, location='singapore', subset_name='singapore')
     preprocess(nusc, ['train', 'test'], root_dir, out_dir, keyword='night', keyword_action='exclude', subset_name='day')
-    preprocess(nusc, ['train', 'val', 'test'], root_dir, out_dir, keyword='night', keyword_action='filter', subset_name='night')
+    preprocess(nusc, ['train', 'val', 'test'], root_dir, out_dir, keyword='night', keyword_action='filter',
+               subset_name='night')
+    print("数据处理完成！！！")
