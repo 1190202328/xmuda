@@ -195,7 +195,7 @@ class SemanticKITTISCN(SemanticKITTIBase):
 
         out_dict = {}
 
-        keep_idx = np.ones(len(points), dtype=np.bool)
+        keep_idx = np.ones(len(points), dtype=np.bool_)
         points_img = data_dict['points_img'].copy()
         img_path = osp.join(self.semantic_kitti_dir, data_dict['camera_path'])
         image = Image.open(img_path)
@@ -278,8 +278,8 @@ class SemanticKITTISCN(SemanticKITTIBase):
 
 def test_SemanticKITTISCN():
     from xmuda.data.utils.visualize import draw_points_image_labels, draw_bird_eye_view
-    preprocess_dir = '/datasets_local/datasets_mjaritz/semantic_kitti_preprocess/preprocess'
-    semantic_kitti_dir = '/datasets_local/datasets_mjaritz/semantic_kitti_preprocess'
+    preprocess_dir = '/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/semantic_kitti_preprocess/preprocess'
+    semantic_kitti_dir = '/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/semantic_kitti_preprocess'
     # pselab_paths = ("/home/docker_user/workspace/outputs/xmuda/a2d2_semantic_kitti/xmuda_crop_resize/pselab_data/train.npy",)
     # split = ('train',)
     split = ('val',)
@@ -310,7 +310,7 @@ def test_SemanticKITTISCN():
 
 
 def compute_class_weights():
-    preprocess_dir = '/datasets_local/datasets_mjaritz/semantic_kitti_preprocess/preprocess'
+    preprocess_dir = '/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/semantic_kitti_preprocess/preprocess'
     split = ('train',)
     dataset = SemanticKITTIBase(split,
                                 preprocess_dir,

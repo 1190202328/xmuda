@@ -187,7 +187,7 @@ def preprocess(split_name, root_dir, out_dir):
 
 if __name__ == '__main__':
     root_dir = '/datasets_master/a2d2'
-    out_dir = '/datasets_local/datasets_mjaritz/a2d2_preprocess'
+    out_dir = '/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/a2d2_preprocess'
     preprocess('test', root_dir, out_dir)
     # split into train1 and train2 to prevent segmentation fault in torch dataloader
     preprocess('train1', root_dir, out_dir)

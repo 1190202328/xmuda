@@ -166,7 +166,7 @@ class NuScenesSCN(NuScenesBase):
 
         out_dict = {}
 
-        keep_idx = np.ones(len(points), dtype=np.bool)
+        keep_idx = np.ones(len(points), dtype=np.bool_)
         if self.use_image:
             points_img = data_dict['points_img'].copy()
             img_path = osp.join(self.nuscenes_dir, data_dict['camera_path'])
@@ -246,8 +246,8 @@ class NuScenesSCN(NuScenesBase):
 
 def test_NuScenesSCN():
     from xmuda.data.utils.visualize import draw_points_image_labels, draw_points_image_depth, draw_bird_eye_view
-    preprocess_dir = '/datasets_local/datasets_mjaritz/nuscenes_preprocess/preprocess'
-    nuscenes_dir = '/datasets_local/datasets_mjaritz/nuscenes_preprocess'
+    preprocess_dir = '/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/nuscenes_preprocess/preprocess'
+    nuscenes_dir = '/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/nuscenes_preprocess'
     # split = ('train_singapore',)
     # pselab_paths = ('/home/docker_user/workspace/outputs/xmuda/nuscenes/usa_singapore/xmuda/pselab_data/train_singapore.npy',)
     split = ('train_night',)
@@ -279,7 +279,7 @@ def test_NuScenesSCN():
 
 
 def compute_class_weights():
-    preprocess_dir = '/datasets_local/datasets_mjaritz/nuscenes_preprocess/preprocess'
+    preprocess_dir = '/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/nuscenes_preprocess/preprocess'
     # split = ('train_usa', 'test_usa')
     split = ('train_day', 'test_day')
     dataset = NuScenesBase(split,

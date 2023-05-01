@@ -259,7 +259,7 @@ class A2D2SCN(A2D2Base):
 
 def test_A2D2SCN():
     from xmuda.data.utils.visualize import draw_points_image_labels, draw_bird_eye_view
-    preprocess_dir = '/datasets_local/datasets_mjaritz/a2d2_preprocess'
+    preprocess_dir = '/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/a2d2_preprocess'
     split = ('test',)
     dataset = A2D2SCN(split=split,
                       preprocess_dir=preprocess_dir,
@@ -283,7 +283,7 @@ def test_A2D2SCN():
 
 
 def compute_class_weights():
-    preprocess_dir = '/datasets_local/datasets_mjaritz/a2d2_preprocess'
+    preprocess_dir = '/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/a2d2_preprocess'
     split = ('train', 'test')
     dataset = A2D2Base(split,
                        preprocess_dir,

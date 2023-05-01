@@ -171,7 +171,7 @@ def preprocess(split_name, root_dir, out_dir):
 
 if __name__ == '__main__':
     root_dir = '/datasets_master/semantic_kitti'
-    out_dir = '/datasets_local/datasets_mjaritz/semantic_kitti_preprocess'
+    out_dir = '/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/semantic_kitti_preprocess'
     preprocess('val', root_dir, out_dir)
     preprocess('train', root_dir, out_dir)
     preprocess('test', root_dir, out_dir)
