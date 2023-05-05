@@ -18,7 +18,7 @@ DATASET_TARGET:
   NuScenesSCN:
     preprocess_dir: "/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/data/nuscenes_preprocess/preprocess"
     nuscenes_dir: "/nfs/s3_common_dataset/nuscenes-full-data-v1.0"  # only front cam images are needed
-    pselab_paths: ("/home/docker_user/workspace/outputs/xmuda/nuscenes/usa_singapore/xmuda/pselab_data/train_singapore.npy",)
+    pselab_paths: ("/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/ckpt/nuscenes/usa_singapore/xmuda/pselab_data/train_singapore.npy",)
 DATALOADER:
   NUM_WORKERS: 4
 OPTIMIZER:
@@ -34,7 +34,7 @@ TRAIN:
   BATCH_SIZE: 8
   SUMMARY_PERIOD: 50
   CHECKPOINT_PERIOD: 5000
-  CLASS_WEIGHTS: [2.47956584, 4.26788384, 5.71114131, 3.80241668, 1.]
+  CLASS_WEIGHTS: [ 2.47956584, 4.26788384, 5.71114131, 3.80241668, 1. ]
   XMUDA:
     lambda_xm_src: 1.0
     lambda_xm_trg: 0.1
@@ -42,4 +42,4 @@ TRAIN:
 VAL:
   BATCH_SIZE: 32
   PERIOD: 5000
-#OUTPUT_DIR: "path/to/output/directory/@"  #  @ will be replaced with config path, e.g. nuscenes/usa_singapore/xmuda
+OUTPUT_DIR: "/nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/ckpt/nuscenes/usa_singapore/xmuda_pl"  #  @ will be replaced with config path, e.g. nuscenes/usa_singapore/xmuda
