@@ -1,15 +1,8 @@
 #!/bin/bash
 
-ROOT=../..
-
-bash /nfs/volume-902-16/tangwenbo/ofs-1.sh
+bash /nfs/volume-902-16/tangwenbo/s3_all.sh
 
 cd /nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda && pip install -ve . -i https://pypi.mirrors.ustc.edu.cn/simple/
 
-cd /nfs/ofs-902-1/object-detection/jiangjing/experiments/MS-MMDA/experiments/source_only_source_combined && CUDA_VISIBLE_DEVICES=0 /home/luban/apps/miniconda/miniconda/envs/torch1101/bin/python -m torch.distributed.launch \
-  --nproc_per_node=$1 \
-  --nnodes=1 \
-  --node_rank=0 \
-  --master_addr=localhost \
-  --master_port=$2 \
-  $ROOT/train.py --config=config.yaml --seed 2 --port $2
+cd /nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda && CUDA_VISIBLE_DEVICES=0 /home/luban/apps/miniconda/miniconda/envs/torch1101/bin/python \
+  xmuda/train_xmuda.py --cfg=configs/nuscenes/usa_singapore/xmuda.yaml

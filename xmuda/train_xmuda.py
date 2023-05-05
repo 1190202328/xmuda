@@ -10,6 +10,7 @@ import warnings
 import torch
 import torch.nn.functional as F
 from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
 
 from xmuda.common.solver.build import build_optimizer, build_scheduler
 from xmuda.common.utils.checkpoint import CheckpointerV2
@@ -161,7 +162,7 @@ def train(cfg, output_dir='', run_name=''):
     end = time.time()
     train_iter_src = enumerate(train_dataloader_src)
     train_iter_trg = enumerate(train_dataloader_trg)
-    for iteration in range(start_iteration, max_iteration):
+    for iteration in tqdm(range(start_iteration, max_iteration)):
         # fetch data_batches for source & target
         _, data_batch_src = train_iter_src.__next__()
         _, data_batch_trg = train_iter_trg.__next__()
