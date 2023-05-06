@@ -3,11 +3,13 @@ import os
 import os.path as osp
 import argparse
 import logging
+import shutil
 import time
 import socket
 import warnings
 
 import torch
+from tqdm import tqdm
 
 from xmuda.common.utils.checkpoint import CheckpointerV2
 from xmuda.common.utils.logger import setup_logger
@@ -90,7 +92,7 @@ def test(cfg, args, output_dir=''):
     model_2d.eval()
     model_3d.eval()
 
-    validate(cfg, model_2d, model_3d, test_dataloader, test_metric_logger, pselab_path=pselab_path)
+    return validate(cfg, model_2d, model_3d, test_dataloader, test_metric_logger, pselab_path=pselab_path)
 
 
 def main():
@@ -127,7 +129,63 @@ def main():
     logger.info('Running with config:\n{}'.format(cfg))
 
     assert cfg.MODEL_2D.DUAL_HEAD == cfg.MODEL_3D.DUAL_HEAD
-    test(cfg, args, output_dir)
+
+    ckpt2d_list = []
+    ckpt3d_list = []
+    if os.path.isdir(args.ckpt2d) and args.ckpt2d == args.ckpt3d:
+        for ckpt_name in os.listdir(args.ckpt2d):
+            if ckpt_name.find('model_2d') != -1 and ckpt_name.endswith('.pth'):
+                ckpt2d_list.append(f'{args.ckpt2d}/{ckpt_name}')
+            if ckpt_name.find('model_3d') != -1 and ckpt_name.endswith('.pth'):
+                ckpt3d_list.append(f'{args.ckpt2d}/{ckpt_name}')
+    elif not os.path.isdir(args.ckpt2d) and not os.path.isdir(args.ckpt2d):
+        ckpt2d_list.append(args.ckpt2d)
+        ckpt3d_list.append(args.ckpt3d)
+    else:
+        raise Exception('provided ckpt path has problem！')
+    ckpt2d_list = sorted(ckpt2d_list)
+    ckpt3d_list = sorted(ckpt3d_list)
+    # 只验证一次的情况
+    if len(ckpt2d_list) == 1 and len(ckpt3d_list) == 1:
+        args.ckpt2d = ckpt2d_list[0]
+        args.ckpt3d = ckpt3d_list[0]
+        test(cfg, args, output_dir)
+    else:
+        # 验证2d
+        print('*' * 25 + 'eval best 2d model' + '*' * 25)
+        best_2d_mIou = 0
+        best_2d_mIou_idx = 0
+        for idx in tqdm(range(len(ckpt2d_list))):
+            ckpt_2d = ckpt2d_list[idx]
+            args.ckpt2d = ckpt_2d
+            args.ckpt3d = ckpt3d_list[0]
+            mIou_dict = test(cfg, args, output_dir)
+            if mIou_dict['2D'] > best_2d_mIou:
+                best_2d_mIou = mIou_dict['2D']
+                best_2d_mIou_idx = idx
+        print(f'best 2d mIou is {round(best_2d_mIou, 1)}, the best model ckpt is [{ckpt2d_list[best_2d_mIou_idx]}]')
+        prefix, _ = os.path.splitext(ckpt2d_list[best_2d_mIou_idx])
+        shutil.copy(ckpt2d_list[best_2d_mIou_idx], f'{prefix}_best.pth')
+        # 验证3d
+        print('*' * 25 + 'eval best 3d model' + '*' * 25)
+        best_3d_mIou = 0
+        best_3d_mIou_idx = 0
+        for idx in tqdm(range(len(ckpt3d_list))):
+            ckpt_3d = ckpt3d_list[idx]
+            args.ckpt2d = ckpt2d_list[0]
+            args.ckpt3d = ckpt_3d
+            mIou_dict = test(cfg, args, output_dir)
+            if mIou_dict['3D'] > best_3d_mIou:
+                best_3d_mIou = mIou_dict['3D']
+                best_3d_mIou_idx = idx
+        print(f'best 3d mIou is {round(best_3d_mIou, 1)}, the best model ckpt is [{ckpt3d_list[best_3d_mIou_idx]}]')
+        prefix, _ = os.path.splitext(ckpt3d_list[best_3d_mIou_idx])
+        shutil.copy(ckpt3d_list[best_3d_mIou_idx], f'{prefix}_best.pth')
+        # 验证最佳的2d+3d
+        print('*' * 25 + 'eval best 2d + 3d model' + '*' * 25)
+        args.ckpt2d = ckpt2d_list[best_2d_mIou_idx]
+        args.ckpt3d = ckpt3d_list[best_3d_mIou_idx]
+        test(cfg, args, output_dir)
 
 
 if __name__ == '__main__':

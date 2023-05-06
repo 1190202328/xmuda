@@ -6,8 +6,8 @@ cd /nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda && pip install -v
 
 # 训练
 cd /nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda && CUDA_VISIBLE_DEVICES=0 /home/luban/apps/miniconda/miniconda/envs/torch1101/bin/python \
-  xmuda/train_xmuda.py --cfg=configs/nuscenes/usa_singapore/xmuda.yaml
+  xmuda/train_xmuda.py --cfg=configs/nuscenes/usa_singapore/xmuda_pl.yaml
 
 # 测试
 cd /nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda && CUDA_VISIBLE_DEVICES=0 /home/luban/apps/miniconda/miniconda/envs/torch1101/bin/python \
-  xmuda/test.py --cfg=configs/nuscenes/usa_singapore/xmuda.yaml /nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/ckpt/nuscenes/usa_singapore/xmuda /nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/ckpt/nuscenes/usa_singapore/xmuda
+  xmuda/test.py --cfg=configs/nuscenes/usa_singapore/xmuda_pl.yaml /nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/ckpt/nuscenes/usa_singapore/xmuda_pl /nfs/ofs-902-1/object-detection/jiangjing/experiments/xmuda/ckpt/nuscenes/usa_singapore/xmuda_pl

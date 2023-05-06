@@ -26,6 +26,7 @@ def validate(cfg,
     pselab_data_list = []
 
     end = time.time()
+    mIou_dict = {}
     with torch.no_grad():
         for iteration, data_batch in enumerate(dataloader):
             data_time = time.time() - end
@@ -78,7 +79,8 @@ def validate(cfg,
                     pselab_data_list.append({
                         'probs_2d': curr_probs_2d[range(len(pred_label_2d)), pred_label_2d].cpu().numpy(),
                         'pseudo_label_2d': pred_label_2d.astype(np.uint8),
-                        'probs_3d': curr_probs_3d[range(len(pred_label_3d)), pred_label_3d].cpu().numpy() if model_3d else None,
+                        'probs_3d': curr_probs_3d[
+                            range(len(pred_label_3d)), pred_label_3d].cpu().numpy() if model_3d else None,
                         'pseudo_label_3d': pred_label_3d.astype(np.uint8) if model_3d else None
                     })
 
@@ -122,7 +124,9 @@ def validate(cfg,
             logger.info('{} overall accuracy={:.2f}%'.format(modality, 100.0 * evaluator.overall_acc))
             logger.info('{} overall IOU={:.2f}'.format(modality, 100.0 * evaluator.overall_iou))
             logger.info('{} class-wise segmentation accuracy and IoU.\n{}'.format(modality, evaluator.print_table()))
+            mIou_dict[modality] = 100.0 * evaluator.overall_iou
 
         if pselab_path is not None:
             np.save(pselab_path, pselab_data_list)
             logger.info('Saved pseudo label data to {}'.format(pselab_path))
+    return mIou_dict
