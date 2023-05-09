@@ -193,6 +193,36 @@ def train(cfg, output_dir='', run_name=''):
         preds_2d = model_2d(data_batch_src)
         preds_3d = model_3d(data_batch_src)
 
+        # for key in data_batch_src.keys():
+        #     try:
+        #         print(f'data_batch_src[{key}].shape = {data_batch_src[key].shape}')
+        #     except AttributeError:
+        #         print(f'data_batch_src[{key}].len = {len(data_batch_src[key])}')
+        # for key in preds_2d.keys():
+        #     try:
+        #         print(f'preds_2d[{key}].shape = {preds_2d[key].shape}')
+        #     except AttributeError:
+        #         print(f'preds_2d[{key}].len = {len(preds_2d[key])}')
+        # for key in preds_3d.keys():
+        #     try:
+        #         print(f'preds_3d[{key}].shape = {preds_3d[key].shape}')
+        #     except AttributeError:
+        #         print(f'preds_3d[{key}].len = {len(preds_3d[key])}')
+        # for i in range(len(data_batch_src["x"])):
+        #     print(f'data_batch_src[x][{i}].shape = {data_batch_src["x"][i].shape}')
+        # # data_batch_src[x][0].shape = torch.Size([21371, 4])
+        # # data_batch_src[x][1].shape = torch.Size([21371, 1])
+        # # data_batch_src[x].len = 2                                 # 3d数据
+        # # data_batch_src[seg_label].shape = torch.Size([21371])     # [B,]
+        # # data_batch_src[img].shape = torch.Size([8, 3, 225, 400])  # [B, C, H, W]
+        # # data_batch_src[img_indices].len = 8                       # 图片的索引序号
+        # # preds_2d[feats].shape = torch.Size([21371, 64])           # [N, C_2d]
+        # # preds_2d[seg_logit].shape = torch.Size([21371, 5])        # [N, num_class]
+        # # preds_2d[seg_logit2].shape = torch.Size([21371, 5])       # [N, num_class]
+        # # preds_3d[feats].shape = torch.Size([21371, 16])           # [N, C_3d]
+        # # preds_3d[seg_logit].shape = torch.Size([21371, 5])        # [N, num_class]
+        # # preds_3d[seg_logit2].shape = torch.Size([21371, 5])       # [N, num_class]
+
         # segmentation loss: cross entropy
         seg_loss_src_2d = F.cross_entropy(preds_2d['seg_logit'], data_batch_src['seg_label'], weight=class_weights)
         seg_loss_src_3d = F.cross_entropy(preds_3d['seg_logit'], data_batch_src['seg_label'], weight=class_weights)
@@ -210,6 +240,12 @@ def train(cfg, output_dir='', run_name=''):
             xm_loss_src_3d = F.kl_div(F.log_softmax(seg_logit_3d, dim=1),
                                       F.softmax(preds_2d['seg_logit'].detach(), dim=1),
                                       reduction='none').sum(1).mean()
+            # print(f'F.log_softmax(seg_logit_2d, dim=1).shape = {F.log_softmax(seg_logit_2d, dim=1).shape}')
+            # print(
+            #     f"F.softmax(preds_3d['seg_logit'].detach(), dim=1).shape = {F.softmax(preds_3d['seg_logit'].detach(), dim=1).shape}")
+            # # F.log_softmax(seg_logit_2d, dim=1).shape = torch.Size([21371, 5])               [N, num_class]
+            # # F.softmax(preds_3d['seg_logit'].detach(), dim=1).shape = torch.Size([21371, 5]) [N, num_class]
+
             train_metric_logger.update(xm_loss_src_2d=xm_loss_src_2d,
                                        xm_loss_src_3d=xm_loss_src_3d)
             loss_2d += cfg.TRAIN.XMUDA.lambda_xm_src * xm_loss_src_2d
@@ -256,6 +292,7 @@ def train(cfg, output_dir='', run_name=''):
             loss_2d.append(cfg.TRAIN.XMUDA.lambda_pl * pl_loss_trg_2d)
             loss_3d.append(cfg.TRAIN.XMUDA.lambda_pl * pl_loss_trg_3d)
         if cfg.TRAIN.XMUDA.lambda_minent > 0:
+            # 没用上
             # MinEnt
             minent_loss_trg_2d = entropy_loss(F.softmax(preds_2d['seg_logit'], dim=1))
             minent_loss_trg_3d = entropy_loss(F.softmax(preds_3d['seg_logit'], dim=1))
